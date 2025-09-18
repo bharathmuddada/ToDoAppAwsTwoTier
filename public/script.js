@@ -26,7 +26,8 @@ async function fetchTasks() {
     taskList.innerHTML = '';
 
     tasks.forEach(task => {
-      const formattedDate = task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date';
+  // Display due_date as-is (YYYY-MM-DD) for local accuracy
+  const formattedDate = task.due_date ? task.due_date : 'No due date';
       const li = document.createElement('li');
       li.innerHTML = `
         <span>${task.task_name} - ${formattedDate}</span>

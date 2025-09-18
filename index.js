@@ -31,11 +31,25 @@ app.get('/config', (req, res) => {
 // Create a new task
 app.post('/tasks', async (req, res) => {
   const { taskName, taskDescription, dueDate } = req.body;
+  // Ensure dueDate is always stored as YYYY-MM-DD string
+  let formattedDueDate = null;
+  if (dueDate) {
+    // If dueDate is already YYYY-MM-DD, use as-is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+      formattedDueDate = dueDate;
+    } else {
+      // Otherwise, try to parse and format
+      const d = new Date(dueDate);
+      if (!isNaN(d.getTime())) {
+        formattedDueDate = d.toISOString().slice(0, 10);
+      }
+    }
+  }
 
   try {
     const [result] = await db.execute(
       'INSERT INTO Tasks (task_name, task_description, due_date) VALUES (?, ?, ?)',
-      [taskName, taskDescription || null, dueDate || null]
+      [taskName, taskDescription || null, formattedDueDate]
     );
 
     res.status(201).json({ message: 'Task created successfully', taskId: result.insertId });
